@@ -6,30 +6,31 @@
                     <img src="../assets/avatar.jpg">
                 </div>
             </el-form-item>
-            <el-form-item prop="userName">
-                <el-input v-model="form.userName" placeholder="请输入用户名" prefix-icon="myicon myicon-user"></el-input>
+            <el-form-item prop="username">
+                <el-input v-model="form.username" placeholder="请输入用户名" prefix-icon="myicon myicon-user"></el-input>
             </el-form-item>
              <el-form-item prop="password">
                 <el-input v-model="form.password" placeholder="请输入密码" prefix-icon="myicon myicon-key"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" class="login-btn">登陆</el-button>
+                <el-button type="primary" class="login-btn" @click="checkLogin('form')">登陆</el-button>
             </el-form-item>
         </el-form>
     </div>
 </template>
 
 <script>
+    import {loginStatus} from '../api/index.js'
+
     export default {
         data(){
             return{
                 form:{
-                    userName:'',
+                    username:'',
                     password:''
-
                 },
                 rules:{
-                    userName: [
+                    username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' },
                     ],
                     password: [
@@ -37,7 +38,31 @@
 
                     ]
 
-                }
+                },
+            }
+        },
+        methods: {
+            checkLogin(formName){
+                this.$refs[formName].validate((valid)=>{
+                    if(valid){
+                        loginStatus(this.form).then(res=>{
+                          
+                            // /*eslint-disable */
+                            // console.log(res)
+                            // /*eslint-disable */
+                            if(res.meta.status === 200){
+                                // alert('ok')
+                                localStorage.setItem('mytoken',res.data.token)
+                                this.$router.push({name:'home'})
+                            }else{
+                                this.$message.error(res.meta.msg);
+                            }
+                        })
+                    }else{
+                        // alert('false')
+                        return false
+                    }
+                });
             }
         }
     };
